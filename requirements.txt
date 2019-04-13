@@ -1,0 +1,4 @@
+pendulum
+psutil
+discord.py
+loguru
