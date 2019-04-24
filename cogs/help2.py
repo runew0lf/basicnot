@@ -11,6 +11,9 @@ class MyHelpCommand(commands.DefaultHelpCommand):
         return "{0.clean_prefix}{1.qualified_name} {1.signature}".format(self, command)
 
     async def send_bot_help(self, mapping):
+        """
+        [p] in docstring will translate to ctx.prefix
+        """
         ctx = self.context
         bot = ctx.bot
 
@@ -33,7 +36,8 @@ class MyHelpCommand(commands.DefaultHelpCommand):
             )
             lines.append(f"**__{category}__**")
             for command in commands:
-                lines.append(f"**{ctx.prefix}{command.name}** - {command.short_doc}")
+                text = command.short_doc.replace("[p]", ctx.prefix)
+                lines.append(f"**{ctx.prefix}{command.name}** - {text}")
 
         note = self.get_ending_note()
         if not note:
@@ -67,13 +71,15 @@ class MyHelpCommand(commands.DefaultHelpCommand):
         )
         lines.append(f"**__{cog.description}__**")
         for command in filtered:
-            lines.append(f"**{ctx.prefix}{command.name}** - {command.short_doc}")
+            text = command.short_doc.replace("[p]", ctx.prefix)
+            lines.append(f"**{ctx.prefix}{command.name}** - {text}")
 
         note = self.get_ending_note()
         if not note:
             note = ""
 
-        lines.append(f"**{ctx.prefix}{command.name}** - {command.description}")
+        text = command.description.replace("[p]", ctx.prefix)
+        lines.append(f"**{ctx.prefix}{command.name}** - {text}")
 
         embed = Embed(color=ctx.me.color, title=f"{ctx.guild.name}")
 
@@ -92,6 +98,9 @@ class MyHelpCommand(commands.DefaultHelpCommand):
         )
 
     async def send_command_help(self, command):
+        """
+        [p] in docstring will translate to ctx.prefix
+        """        
         ctx = self.context
         bot = ctx.bot
         destination = self.get_destination()
@@ -105,7 +114,8 @@ class MyHelpCommand(commands.DefaultHelpCommand):
             icon_url=bot.user.avatar_url_as(format="png"),
         )
         embed.set_footer(text=note)
-        embed.description = f"**__{ctx.prefix}{command.name}__**\n{command.help}"
+        text = command.help.replace("[p]", ctx.prefix)
+        embed.description = f"**__{ctx.prefix}{command.name}__**\n{text}"
         await destination.send(embed=embed)
 
 
