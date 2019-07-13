@@ -11,7 +11,7 @@ from loguru import logger as log
 from cogs.utils import pyson
 
 cogs_dir = "cogs"
-ignored_cogs = [""]
+ignored_cogs = ["help"]
 
 
 def get_prefix(client, message):
