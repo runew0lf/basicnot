@@ -1,10 +1,10 @@
 {
     "598524730206846977": {
-        "channel_id": 598803745672790016,
+        "channel_id": 600276405904736266,
         "social": {
             "twitter": {
                 "username": "runew0lf",
-                "last_post": 1149654855281041409
+                "last_post": 1151075179067576325
             },
             "instagram": {
                 "username": "runew0lf",
@@ -12,7 +12,7 @@
             },
             "twitch": {
                 "username": "runew0lf",
-                "live": true
+                "live": false
             },
             "mixer": {
                 "username": "runew0lf",
@@ -24,9 +24,9 @@
             },
             "reddit": {
                 "username": "runew0lf",
-                "last_post": "etlhf62"
+                "last_post": "etuv5ms"
             }
         },
-        "notification_id": 599221235926302721
+        "notification_id": 600276390423822337
     }
 }

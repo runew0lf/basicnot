@@ -61,6 +61,9 @@ async def on_guild_remove(guild):
     bot.config.data["servers"].pop(str(guild.id), None)
     bot.config.save()
 
+@bot.event
+async def on_error(ctx, error):
+    raise error
 
 bot.config = pyson.Pyson("cogs/config/config.json")
 token = bot.config.data.get("config").get("token")

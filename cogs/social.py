@@ -1,11 +1,11 @@
 import json
 
+import discord
 import feedparser
 import praw
 import requests
 import twitch
 import twitter
-import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import AutoShardedBot
 from loguru import logger as log
@@ -13,44 +13,22 @@ from loguru import logger as log
 from cogs.utils import checks
 from cogs.utils.instagram import InstagramScraper
 
-
 emoji_list = [
     "<:youtube:598977459622248651>",
     "<:twitter:598977459353944121>",
     "<:twitch:598977459173720064>",
     "<:reddit:598977459177914368>",
     "<:mixer:598977459085639687>",
-    "<:instagram:598978116404248693>"
+    "<:instagram:598978116404248693>",
 ]
-role_list = [
-    "Youtube",
-    "Twitter",
-    "Twitch",
-    "Reddit",
-    "Mixer",
-    "Instagram"
-]
+role_list = ["Youtube", "Twitter", "Twitch", "Reddit", "Mixer", "Instagram"]
+
 
 class Social(commands.Cog):
     def __init__(self, bot: AutoShardedBot):
         self.bot = bot
         with open("cogs\\config\\data.json") as fh:
             self.data = json.load(fh)
-
-        # self.data = {
-        #     "598524730206846977":
-        #     {
-        #         "channel_id": 598803745672790016,
-        #         "social": {
-        #             "twitter": {"username": "runew0lf", "last_post": None},
-        #             "instagram": {"username": "runew0lf", "last_post": None},
-        #             "twitch": {"username": "runew0lf", "live": False},
-        #             "mixer": {"username": "runew0lf", "live": False},
-        #             "youtube": {"username": "runew0lf", "last_post": False},
-        #             "reddit": {"username": "runew0lf", "last_post": False},
-        #         },
-        #     },
-        # }
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -267,10 +245,14 @@ class Social(commands.Cog):
         if msg.content == "yes":
             await ctx.send("Sure let me get that setup for you")
             overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False),
-                ctx.guild.me: discord.PermissionOverwrite(send_messages=True)
-            }            
-            channel = await ctx.guild.create_text_channel("Notification-Subscription", overwrites=overwrites)
+                ctx.guild.default_role: discord.PermissionOverwrite(
+                    send_messages=False
+                ),
+                ctx.guild.me: discord.PermissionOverwrite(send_messages=True),
+            }
+            channel = await ctx.guild.create_text_channel(
+                "Notification-Subscription", overwrites=overwrites
+            )
             message = await channel.send(
                 "To subcribe to notifications, simply click the below buttons to start"
             )
@@ -282,10 +264,60 @@ class Social(commands.Cog):
                 await ctx.guild.create_role(name=role, mentionable=True)
             await ctx.send("Roles Created")
             self.data[str(ctx.guild.id)]["notification_id"] = message.id
-            with open("cogs\\config\\data.json", "w") as fh:
-                json.dump(self.data, fh, indent=4)            
         else:
             await ctx.send("Ok, no notification channel")
+
+        channel = await ctx.guild.create_text_channel(
+            "SocialBot-Alerts", overwrites=overwrites
+        )
+        self.data[str(ctx.guild.id)]["channel_id"] = channel.id
+        # setup twitch user
+        await ctx.send(
+            "Please enter your Twitch username or `None` if you dont have one"
+        )
+        msg = await self.bot.wait_for("message", check=check)
+        self.data[str(ctx.guild.id)]["social"]["twitch"]["username"] = msg.content
+        self.data[str(ctx.guild.id)]["social"]["twitch"]["live"] = False
+        # setup mixer user
+        await ctx.send(
+            "Please enter your Mixer username or `None` if you dont have one"
+        )
+        msg = await self.bot.wait_for("message", check=check)
+        self.data[str(ctx.guild.id)]["social"]["mixer"]["username"] = msg.content
+        self.data[str(ctx.guild.id)]["social"]["mixer"]["live"] = False
+        # setup twitter user
+        await ctx.send(
+            "Please enter your Twitter username or `None` if you dont have one"
+        )
+        msg = await self.bot.wait_for("message", check=check)
+        self.data[str(ctx.guild.id)]["social"]["twitter"]["username"] = msg.content
+        self.data[str(ctx.guild.id)]["social"]["twitter"]["last_post"] = False
+        # setup instagram user
+        await ctx.send(
+            "Please enter your Instagram username or `None` if you dont have one"
+        )
+        msg = await self.bot.wait_for("message", check=check)
+        self.data[str(ctx.guild.id)]["social"]["instagram"]["username"] = msg.content
+        self.data[str(ctx.guild.id)]["social"]["instagram"]["last_post"] = False
+        # setup youtube user
+        await ctx.send(
+            "Please enter your Youtube username or `None` if you dont have one"
+        )
+        msg = await self.bot.wait_for("message", check=check)
+        self.data[str(ctx.guild.id)]["social"]["youtube"]["username"] = msg.content
+        self.data[str(ctx.guild.id)]["social"]["youtube"]["last_post"] = False
+        # setup reddit user
+        await ctx.send(
+            "Please enter your Reddit username or `None` if you dont have one"
+        )
+        msg = await self.bot.wait_for("message", check=check)
+        self.data[str(ctx.guild.id)]["social"]["reddit"]["username"] = msg.content
+        self.data[str(ctx.guild.id)]["social"]["reddit"]["last_post"] = False
+
+        await ctx.send("All data has been saved, enjoy SocialBot")
+        # Write out data
+        with open("cogs\\config\\data.json", "w") as fh:
+            json.dump(self.data, fh, indent=4)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -325,4 +357,3 @@ class Social(commands.Cog):
 def setup(bot):
     bot.add_cog(Social(bot))
     log.info("Cog loaded: Social")
-
